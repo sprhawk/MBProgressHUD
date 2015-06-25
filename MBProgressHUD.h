@@ -30,6 +30,14 @@
 #import <UIKit/UIKit.h>
 #import <CoreGraphics/CoreGraphics.h>
 
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
+#define MBLabelAlignmentCenter NSTextAlignmentCenter
+#define MBLabelAlignmentLeft NSTextAlignmentLeft
+#else
+#define MBLabelAlignmentCenter UITextAlignmentCenter
+#define MBLabelAlignmentLeft UITextAlignmentLeft
+#endif
+
 @protocol MBProgressHUDDelegate;
 
 
@@ -315,6 +323,11 @@ typedef void (^MBProgressHUDCompletionBlock)();
  * property is also set and is different from an empty string (@""). The details text can span multiple lines. 
  */
 @property (copy) NSString *detailsLabelText;
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
+@property (assign) NSTextAlignment detailsLabelAlignment;
+#else
+@property (assign) UITextAlignment detailsLabelAlignment;
+#endif
 
 /** 
  * The opacity of the HUD window. Defaults to 0.8 (80% opacity). 

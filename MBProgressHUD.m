@@ -18,12 +18,6 @@
 	#define MB_RETAIN(exp) [exp retain]
 #endif
 
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
-    #define MBLabelAlignmentCenter NSTextAlignmentCenter
-#else
-    #define MBLabelAlignmentCenter UITextAlignmentCenter
-#endif
-
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= 70000
 	#define MB_TEXTSIZE(text, font) [text length] > 0 ? [text \
 		sizeWithAttributes:@{NSFontAttributeName:font}] : CGSizeZero;
@@ -187,6 +181,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 		self.removeFromSuperViewOnHide = NO;
 		self.minSize = CGSizeZero;
 		self.square = NO;
+        self.detailsLabelAlignment = MBLabelAlignmentCenter;
 		self.contentMode = UIViewContentModeCenter;
 		self.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin
 								| UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
@@ -460,13 +455,14 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 	detailsLabel = [[UILabel alloc] initWithFrame:self.bounds];
 	detailsLabel.font = self.detailsLabelFont;
 	detailsLabel.adjustsFontSizeToFitWidth = NO;
-	detailsLabel.textAlignment = MBLabelAlignmentCenter;
+	detailsLabel.textAlignment = self.detailsLabelAlignment;
 	detailsLabel.opaque = NO;
 	detailsLabel.backgroundColor = [UIColor clearColor];
 	detailsLabel.textColor = self.detailsLabelColor;
 	detailsLabel.numberOfLines = 0;
 	detailsLabel.font = self.detailsLabelFont;
 	detailsLabel.text = self.detailsLabelText;
+    detailsLabel.lineBreakMode = NSLineBreakByCharWrapping;
 	[self addSubview:detailsLabel];
 }
 
@@ -672,7 +668,8 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 
 - (NSArray *)observableKeypaths {
 	return [NSArray arrayWithObjects:@"mode", @"customView", @"labelText", @"labelFont", @"labelColor",
-			@"detailsLabelText", @"detailsLabelFont", @"detailsLabelColor", @"progress", @"activityIndicatorColor", nil];
+			@"detailsLabelText", @"detailsLabelFont", @"detailsLabelColor", @"progress", @"activityIndicatorColor",
+            @"detailsLabelAlignment", nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -704,7 +701,10 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
 			[(id)indicator setValue:@(progress) forKey:@"progress"];
 		}
 		return;
-	}
+    } else if ([keyPath isEqualToString:@"detailsLabelAlignment"]) {
+        detailsLabel.textAlignment = self.detailsLabelAlignment;
+    }
+    
 	[self setNeedsLayout];
 	[self setNeedsDisplay];
 }
